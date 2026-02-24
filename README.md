@@ -5,33 +5,28 @@
 - 运行一条命令完成质量评测和 VLM Judge 评测；
 - 结果输出到固定目录，便于后续汇总。
 
-> 你在服务器上使用时，会在 `/DATA/wangyuanfei/jf/paibench` 下 `git clone` 本仓库。本文所有路径都以仓库根目录（`paibench`）为基准，确保和其他任务文件夹隔离。
-
 ## 目录约定（你只需要往这里放数据）
 
 请把数据放在以下位置：
 
 ```text
-paibench/
-├── data/paibench_g/
-│   ├── hf_dataset/
-│   │   ├── cosmos_predict2_bench_full_info.json
-│   │   ├── condition_image/
-│   │   └── vqa/
-│   ├── videos/
-│   │   ├── {video_id}__{seed}.mp4
-│   │   └── ...
-│   └── results/
-├── external/
-└── scripts/
+data/paibench_g/
+├── hf_dataset/
+│   ├── cosmos_predict2_bench_full_info.json
+│   ├── condition_image/
+│   └── vqa/
+├── videos/
+│   ├── {video_id}__{seed}.mp4
+│   └── ...
+└── results/
 ```
 
 其中：
-- `data/paibench_g/hf_dataset/`：放从 Hugging Face `physical-ai-bench-generation` 下载的数据。
-- `data/paibench_g/videos/`：放你模型生成的视频，命名必须是 `{video_id}__{seed}.mp4`。
-- `data/paibench_g/results/`：评测输出目录（可为空，脚本会自动创建）。
+- `hf_dataset/`：放从 Hugging Face `physical-ai-bench-generation` 下载的数据。
+- `videos/`：放你模型生成的视频，命名必须是 `{video_id}__{seed}.mp4`。
+- `results/`：评测输出目录（可为空，脚本会自动创建）。
 
-## 一次性环境准备（会创建独立 conda 环境）
+## 一次性环境准备
 
 ```bash
 bash scripts/setup_paibench_g.sh
@@ -39,23 +34,11 @@ bash scripts/setup_paibench_g.sh
 
 该脚本会：
 1. 将官方仓库克隆到 `external/physical-ai-bench`（若已存在则跳过克隆）；
-2. 创建一个新的 conda 环境（默认名：`paibench-g`，可通过环境变量修改）；
-3. 在该 conda 环境中安装 `uv`；
-4. 在 `external/physical-ai-bench/generation` 下执行依赖安装：
-   - `uv sync --active`
-   - `uv pip install --python "$(which python)" --no-build-isolation "git+https://github.com/facebookresearch/detectron2.git"`
+2. 在 `external/physical-ai-bench/generation` 下执行依赖安装：
+   - `uv sync`
+   - `uv pip install --no-build-isolation "git+https://github.com/facebookresearch/detectron2.git"`
 
-### 可选：自定义环境名和 Python 版本
-
-```bash
-PAIBENCH_CONDA_ENV=paibench-g-cu121 PAIBENCH_PYTHON_VERSION=3.10 bash scripts/setup_paibench_g.sh
-```
-
-## 运行评测（请在新 conda 环境中运行）
-
-```bash
-conda activate paibench-g
-```
+## 运行评测
 
 ### 1) 先做本地检查（不执行评测）
 
